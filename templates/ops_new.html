@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<head>
+    <meta http-equiv="refresh" content="{{refresh}}"> 
+    <title>FD 2021 - sendeplan</title>
+  <style>
+    table, td, th {
+      border: 1px solid black;
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 85%;
+      margin-left: auto;
+      margin-right: auto;
+      table-layout: fixed;
+
+    }
+
+    th {
+      height: 70px;
+      padding-right: 10px;
+    }
+    td {
+      height: 30px;
+    }
+    /* Kanskje litt copypaste? */
+    h1 {
+      /*    -webkit-text-stroke-width: 2px;
+            -webkit-text-stroke-color: white;
+            z-index: 10;
+            position: relative; 
+            UGH PLASSER DENNE BAK PÅ EN MÅTE! */
+      font-size: 40px;
+      background-image: 
+      linear-gradient(to right, red, orange, orange, yellow, yellow, green, green, blue, blue, indigo, indigo, violet, violet, red); 
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;  
+      animation: move 100s linear infinite;
+      text-align: center;
+      font-family: Comic Sans MS;
+      
+    }
+    @keyframes move {
+        to {
+          background-position: 4500vh;
+        }
+      }
+
+    body {
+      text-align: center;
+      background-color: lightgrey;
+      font-family: Arial;
+      
+    }
+  </style>
+</head>
+<body>
+<h1 style=" "
+            > FD-sendeplan! <br> {{hourOfDay}}:00-{{nexthourOfDay}}:00
+</h1>
+
+<p>Last refresh {{last_refresh}}</p>
+<p>Next refresh {{next_refresh}}</p>
+
+<div class="venstre">
+  <img src="/static/GladJente.png" width="50" height="75">
+</div>
+            
+{% for op in curops %}
+<h2> {{shacks[(loop.index-1)]}} </h2>
+<h3> {{radios[(loop.index-1)]}} </h3>
+<table border="1" class="dataframe data"
+style="background-color: {{colors[(loop.index-1)]}};">
+<thead>
+	<tr style="text-align: right;">
+		<th>Lisensiert operatør</th>
+		<th>Hjelpeoperatør</th>
+	</tr>
+</thead>
+</table>
+	{{op|safe}}
+<h3>Neste time</h3>
+{% for op in nextops %}
+	{{nextops|safe}}
+{% endfor %}
+<br>
+
+{% endfor %}
+
+<!--
+<table border="1" class="dataframe data"
+style="background-color: #fff0c5;">
+
+  <thead>
+    <tr style="text-align: right;">
+      <th>IC-756 PRO III</th>
+      <th>60m / 10m</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Lisensiert operatør</td>
+      <td>Hjelpeoperatør</td>
+    </tr>
+    <tr>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+  </tbody>
+</table>
+-->
+<p style="text-align: center;">&copy; 2021 Kristosh Industries</p>
+
+</body></html>
