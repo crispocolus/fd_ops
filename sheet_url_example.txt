@@ -1,0 +1,2 @@
+https://docs.google.com/spreadsheets/d/<this-needs-to-be-your-Google-Sheets-ID>/export?format=csv&gid=0
+#please rename this file to sheet_url.txt for the script to work
