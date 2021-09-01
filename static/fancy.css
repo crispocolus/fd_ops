@@ -1,0 +1,43 @@
+table, td, th {
+      border: 1px solid black;
+    }
+    table {
+      border-collapse: collapse;
+      width: 85%;
+      margin-left: auto;
+      margin-right: auto;
+      table-layout: fixed;
+    }
+    th {
+      height: 70px;
+      padding-right: 10px;
+    }
+    td {
+      height: 30px;
+    }
+    /* Kanskje litt copypaste? */
+    h1 {
+      /*    -webkit-text-stroke-width: 2px;
+            -webkit-text-stroke-color: white;
+            z-index: 10;
+            position: relative; 
+            UGH PLASSER DENNE BAK PÅ EN MÅTE! */
+      font-size: 40px;
+      background-image: 
+      linear-gradient(to right, red, orange, orange, yellow, yellow, green, green, blue, blue, indigo, indigo, violet, violet, red); 
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;  
+      animation: move 100s linear infinite;
+      text-align: center;
+      font-family: Comic Sans MS;
+    }
+    @keyframes move {
+        to {
+          background-position: 4500vh;
+        }
+      }
+    body {
+      text-align: center;
+      background-color: lightgrey;
+      font-family: Arial;      
+    }
