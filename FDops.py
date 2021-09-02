@@ -131,7 +131,7 @@ print('Starting from ')
 print(sheet_url)
 
 #used to pause the script until next full minute for ease of mind
-sleepUntil()
+#sleepUntil()
 
 #run first time for populating tables
 fetch_sheets_data()
@@ -142,16 +142,27 @@ sched.start()
 
 #makes the .html files and posts them
 @app.route('/', methods=("POST", "GET"))
-def index():
+def ops():
     return render_template('ops.html',
        	curops=[ic9100ops, flex6500ops, ic7610ops, ic756ops],
-	nextops=[ic9100next, flex6500next, ic7610next, ic756next],
+	#nextops=[ic9100next, flex6500next, ic7610next, ic756next],
 	shacks=['Shack-00', 'Shack-01', 'Shack-02', 'Shack-03'],
        	radios=['IC-9100 | 40m', 'Flex-6500 | 160 / 20m', 'IC-7610 | 80m / 15m', 'IC756 Pro III |  60m / 10m'],
        	colors=['#add19e', '#f8c491', '#c8dcf1', '#fff0c5'],
 	last_refresh=last_run, next_refresh=next_run,
        	hourOfDay=currentHour, nexthourOfDay=nextHour,
        	refresh=refreshCycle)
+
+@app.route('/nextops', methods=("POST", "GET"))
+def nextOps():
+    return render_template('ops_next.html',
+        nextops=[ic9100next, flex6500next, ic7610next, ic756next],
+        shacks=['Shack-00', 'Shack-01', 'Shack-02', 'Shack-03'],
+        radios=['IC-9100 | 40m', 'Flex-6500 | 160 / 20m', 'IC-7610 | 80m / 15m', 'IC756 Pro III |  60m / 10m'],
+	colors=['#add19e', '#f8c491', '#c8dcf1', '#fff0c5'],
+        last_refresh=last_run, next_refresh=next_run,
+        hourOfDay=nextHour, nexthourOfDay=(nextHour+1),
+        refresh=refreshCycle)
 
 #example for generating single-shack timeslots
 #@app.route('/ic9100', methods=("POST", "GET"))
