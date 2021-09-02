@@ -2,20 +2,20 @@
 <html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <head>
     	<meta http-equiv="refresh" content="{{refresh}}"> 
-    	<title>FD 2021 - sendeplan</title>
+    	<title>FD 2021 - {{shack}}</title>
 	<link href="/static/fancy.css" rel="stylesheet">
 </head>
 <body>
 <h1 style=" "
             > FD-sendeplan! <br> {{hourOfDay}}:00-{{nexthourOfDay}}:00
 </h1>
+<h2> for {{shack}} </h2>
 
 <div class="venstre">
   <img src="/static/GladJente.png" width="50" height="75">
 </div>
             
 {% for op in curops %}
-<h2> {{shacks[(loop.index-1)]}} </h2>
 <h3> {{radios[(loop.index-1)]}} </h3>
 <table border="1" class="dataframe data"
 style="background-color: {{colors[(loop.index-1)]}};">

@@ -100,29 +100,15 @@ def fetch_sheets_data():
 	global ic9100ops
 	global flex6500ops
 	global ic7610ops
-#	global ts2000ops
 	global ic756ops
-
-	global ic9100next
-	global flex6500next
-	global ic7610next
-#	global ts2000next
-	global ic756next
+#	global ts2000ops
 
 	#reads predefined rows and columns for current time-slot, converts to html-data
-	ic9100ops = (curOps.iloc[[timeRow], [1,2]]).to_html(classes='data', index=False, header=False)
-	flex6500ops = (curOps.iloc[[timeRow], [3,4]]).to_html(classes='data', index=False, header=False)
-	ic7610ops = (curOps.iloc[[timeRow], [5,6]]).to_html(classes='data', index=False, header=False)
-#	ts2000ops = (curOps.iloc[[timeRow], [7,8]]).to_html(classes='data', index=False, header=False)
-	ic756ops = (curOps.iloc[[timeRow], [9,10]]).to_html(classes='data', index=False, header=False)
-
-	#operators for next time-slot
-	ic9100next = (curOps.iloc[[(timeRow+1)], [1,2]]).to_html(classes='data', index=False, header=False)
-       	flex6500next = (curOps.iloc[[(timeRow+1)], [3,4]]).to_html(classes='data', index=False, header=False)
-       	ic7610next = (curOps.iloc[[(timeRow+1)], [5,6]]).to_html(classes='data', index=False, header=False)
-#       	ts2000next = (curOps.iloc[[(timeRow+1)], [7,8]]).to_html(classes='data', index=False, header=False)
-       	ic756next = (curOps.iloc[[(timeRow+1)], [9,10]]).to_html(classes='data', index=False, header=False)
-
+	ic9100ops = (curOps.iloc[[timeRow, (timeRow+1), (timeRow+2)], [0,1,2]]).to_html(classes='data', index=False, header=False)
+	flex6500ops = (curOps.iloc[[timeRow, (timeRow+1), (timeRow+2)], [0,3,4]]).to_html(classes='data', index=False, header=False)
+	ic7610ops = (curOps.iloc[[timeRow, (timeRow+1), (timeRow+2)], [0,5,6]]).to_html(classes='data', index=False, header=False)
+	ic756ops = (curOps.iloc[[timeRow, (timeRow+1), (timeRow+2)], [0,7,8]]).to_html(classes='data', index=False, header=False)
+#	ts2000ops = (curOps.iloc[[timeRow, (timeRow+1), (timeRow+2)], [0,9,10]]).to_html(classes='data', index=False, header=False)
 
 #RUNTIME
 
@@ -144,30 +130,69 @@ sched.start()
 @app.route('/', methods=("POST", "GET"))
 def ops():
     return render_template('ops.html',
-       	curops=[ic9100ops, flex6500ops, ic7610ops, ic756ops],
-	#nextops=[ic9100next, flex6500next, ic7610next, ic756next],
 	shacks=['Shack-00', 'Shack-01', 'Shack-02', 'Shack-03'],
+       	curops=[ic9100ops, flex6500ops, ic7610ops, ic756ops],
        	radios=['IC-9100 | 40m', 'Flex-6500 | 160 / 20m', 'IC-7610 | 80m / 15m', 'IC756 Pro III |  60m / 10m'],
        	colors=['#add19e', '#f8c491', '#c8dcf1', '#fff0c5'],
 	last_refresh=last_run, next_refresh=next_run,
        	hourOfDay=currentHour, nexthourOfDay=nextHour,
        	refresh=refreshCycle)
 
-@app.route('/nextops', methods=("POST", "GET"))
-def nextOps():
-    return render_template('ops_next.html',
-        nextops=[ic9100next, flex6500next, ic7610next, ic756next],
-        shacks=['Shack-00', 'Shack-01', 'Shack-02', 'Shack-03'],
-        radios=['IC-9100 | 40m', 'Flex-6500 | 160 / 20m', 'IC-7610 | 80m / 15m', 'IC756 Pro III |  60m / 10m'],
-	colors=['#add19e', '#f8c491', '#c8dcf1', '#fff0c5'],
+#generating single-shack timeslots
+@app.route('/shack00', methods=("POST", "GET"))
+def shack00_table():
+    	return render_template('shack00.html',
+	shack='Shack-00',
+        curops=[ic9100ops],
+        radios=['IC-9100 | 40m'],
+        colors=['#add19e'],
         last_refresh=last_run, next_refresh=next_run,
-        hourOfDay=nextHour, nexthourOfDay=(nextHour+1),
+        hourOfDay=currentHour, nexthourOfDay=nextHour,
         refresh=refreshCycle)
 
-#example for generating single-shack timeslots
-#@app.route('/ic9100', methods=("POST", "GET"))
-#def ic9100_table():
-#    	return render_template('ic9100.html', tables=ic9100ops, titles=['NA'])
+@app.route('/shack01', methods=("POST", "GET"))
+def shack01_table():
+        return render_template('shack01.html',
+        shack='Shack-01',
+        curops=[flex6500ops],
+        radios=['Flex-6500 | 160 / 20m'],
+        colors=['#f8c491'],
+        last_refresh=last_run, next_refresh=next_run,
+        hourOfDay=currentHour, nexthourOfDay=nextHour,
+        refresh=refreshCycle)
+
+@app.route('/shack02', methods=("POST", "GET"))
+def shack02_table():
+        return render_template('shack02.html',
+        shack='Shack-02',
+        curops=[ic7610ops],
+        radios=['IC-7610 | 80m / 15m'],
+        colors=['#c8dcf1'],
+        last_refresh=last_run, next_refresh=next_run,
+        hourOfDay=currentHour, nexthourOfDay=nextHour,
+        refresh=refreshCycle)
+
+@app.route('/shack03', methods=("POST", "GET"))
+def shack03_table():
+        return render_template('shack03.html',
+        shack='Shack-03',
+        curops=[ic756ops],
+        radios=['IC756 Pro III | 60m / 10m'],
+        colors=['#fff0c5'],
+        last_refresh=last_run, next_refresh=next_run,
+        hourOfDay=currentHour, nexthourOfDay=nextHour,
+        refresh=refreshCycle)
+
+#@app.route('/shack04', methods=("POST", "GET"))
+#def shack04_table():
+#        return render_template('shack04.html',
+#        shack='Shack-04',
+#        curops=[ts2000ops],
+#        radios=['TS-2000 | 60m / 10m'],
+#        colors=[''],
+#        last_refresh=last_run, next_refresh=next_run,
+#        hourOfDay=currentHour, nexthourOfDay=nextHour,
+#        refresh=refreshCycle)
 
 #run the Flask-app
 if __name__ == '__main__':
