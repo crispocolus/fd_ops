@@ -6,14 +6,17 @@
 	<link href="/static/fancy.css" rel="stylesheet">
 </head>
 <body>
-<h1 style=" "
-            > FD-sendeplan! <br> {{hourOfDay}}:00-{{nexthourOfDay}}:00
+<h1 style=" ">FD-sendeplan!<br>{{hourOfDay}}:00-{{nexthourOfDay}}:00
 </h1>
-<h2> for {{shack}} </h2>
 
+<a href="/">
 <div class="venstre">
   <img src="/static/GladJente.png" width="50" height="75">
 </div>
+</a>
+<p> Trykk på Karen for å gå tilbake </p>
+
+<h2> for {{shack}} </h2>
             
 {% for op in curops %}
 <h3> {{radios[(loop.index-1)]}} </h3>

@@ -16,11 +16,13 @@ with open('sheet_url.txt', 'r') as file:
    	sheet_url = file.read().replace('\n', '')
 
 #set when to reload the sheets and to refresh the web-page, in seconds)
-refreshCycle = int(600)
+pullCycle = int(600)
+refreshCycle = int(60)
 
 #FUNCTIONS
 #stupid function to determine what row to read
-def whatRow(i):
+
+def timeToRow(i):
 	switcher={
 	15:1,
 	16:2,
@@ -48,6 +50,18 @@ def whatRow(i):
 	14:24
 	}
 	return switcher.get(i, "Invalid value")
+
+#gave up on this function <- :'/
+#def findRows(hour):
+#	row = timeToRow(hour)
+#	for hour in range(13, 14):
+#		switcher={
+#		13:(row, (row+1)),
+#		14:(row)
+#		}
+#		return switcher.get(hour, row)
+#	return row
+
 
 #function to determine nearest minute, with resoulution <- spare for now
 #def round_minutes(clock, direction, resolution):
@@ -84,9 +98,11 @@ def determineClock():
         currentHour = int(format(dt.datetime.today().hour))
 	nextHour = int(currentHour + 1)
 
-	#what row to read??
-        timeRow = whatRow(currentHour)
-	return last_run, next_run, timeRow
+	#what rows to read??
+	#row, rtr = findRows(currentHour)
+	row = timeToRow(currentHour)
+	#return last_run, next_run, row, rtr
+	return last_run, next_run, row
 
 #function for reading stuff from the sheet
 def fetch_sheets_data():
@@ -94,7 +110,8 @@ def fetch_sheets_data():
 	curOps = pd.read_csv(sheet_url)
 
 	#pickup time stuff
-	last_run,next_run,timeRow = determineClock()
+#	last_run,next_run,row,rtr = determineClock()
+	last_run,next_run,row = determineClock()
 
 	#defines variables
 	global ic9100ops
@@ -104,11 +121,17 @@ def fetch_sheets_data():
 #	global ts2000ops
 
 	#reads predefined rows and columns for current time-slot, converts to html-data
-	ic9100ops = (curOps.iloc[[timeRow, (timeRow+1), (timeRow+2)], [0,1,2]]).to_html(classes='data', index=False, header=False)
-	flex6500ops = (curOps.iloc[[timeRow, (timeRow+1), (timeRow+2)], [0,3,4]]).to_html(classes='data', index=False, header=False)
-	ic7610ops = (curOps.iloc[[timeRow, (timeRow+1), (timeRow+2)], [0,5,6]]).to_html(classes='data', index=False, header=False)
-	ic756ops = (curOps.iloc[[timeRow, (timeRow+1), (timeRow+2)], [0,7,8]]).to_html(classes='data', index=False, header=False)
+	ic9100ops = (curOps.iloc[[row, (row+1), (row+2)], [0,1,2]]).to_html(classes='data', index=False, header=False)
+	flex6500ops = (curOps.iloc[[row, (row+1), (row+2)], [0,3,4]]).to_html(classes='data', index=False, header=False)
+	ic7610ops = (curOps.iloc[[row, (row+1), (row+2)], [0,5,6]]).to_html(classes='data', index=False, header=False)
+	ic756ops = (curOps.iloc[[row, (row+1), (row+2)], [0,7,8]]).to_html(classes='data', index=False, header=False)
 #	ts2000ops = (curOps.iloc[[timeRow, (timeRow+1), (timeRow+2)], [0,9,10]]).to_html(classes='data', index=False, header=False)
+
+	#test for skipping rows when time 13-14
+#	ic9100ops = (curOps.iloc[[rtr, [0,1,2]]).to_html(classes='data', index=False, header=False)
+#	flex6500ops = (curOps.iloc[rtr, [0,3,4]]).to_html(classes='data', index=False, header=False)
+#	ic7610ops = (curOps.iloc[(rtr), [0,5,6]]).to_html(classes='data', index=False, header=False)
+#	ic756ops = (curOps.iloc[(rtr), [0,7,8]]).to_html(classes='data', index=False, header=False)
 
 #RUNTIME
 
@@ -123,7 +146,7 @@ print(sheet_url)
 fetch_sheets_data()
 
 #create scheduled task, then start schedule
-sched.add_job(fetch_sheets_data,'interval', seconds=(refreshCycle))
+sched.add_job(fetch_sheets_data,'interval', seconds=(pullCycle))
 sched.start()
 
 #makes the .html files and posts them
@@ -134,6 +157,7 @@ def ops():
        	curops=[ic9100ops, flex6500ops, ic7610ops, ic756ops],
        	radios=['IC-9100 | 40m', 'Flex-6500 | 160 / 20m', 'IC-7610 | 80m / 15m', 'IC756 Pro III |  60m / 10m'],
        	colors=['#add19e', '#f8c491', '#c8dcf1', '#fff0c5'],
+	links=['/shack00', '/shack01', '/shack02', '/shack03'],
 	last_refresh=last_run, next_refresh=next_run,
        	hourOfDay=currentHour, nexthourOfDay=nextHour,
        	refresh=refreshCycle)

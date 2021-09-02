@@ -15,7 +15,9 @@
 </div>
             
 {% for op in curops %}
+<a href="{{links[(loop.index-1)]}}">
 <h2> {{shacks[(loop.index-1)]}} </h2>
+</a>
 <h3> {{radios[(loop.index-1)]}} </h3>
 <table border="1" class="dataframe data"
 style="background-color: {{colors[(loop.index-1)]}};">
