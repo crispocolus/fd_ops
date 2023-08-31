@@ -3,7 +3,7 @@ from flask import Flask, request, render_template, session, redirect
 import pandas as pd
 import datetime as dt
 import time
-from apscheduler.schedulers.background import BackgroundScheduler 
+from apscheduler.schedulers.background import BackgroundScheduler
 import logging
 
 #define various crap
@@ -89,8 +89,8 @@ def determineClock():
         #determine last and next run
 	global last_run
 	global next_run
-        last_run = now.strftime("%H:%M")
-        next_run = (now + dt.timedelta(seconds = (refreshCycle))).strftime("%H:%M")
+        last_run = now.strftime("%H:%M:%S")
+        next_run = (now + dt.timedelta(seconds = (pullCycle))).strftime("%H:%M:%S")
 
         #finds current and nextHour
 	global currentHour
@@ -114,18 +114,22 @@ def fetch_sheets_data():
 	last_run,next_run,row = determineClock()
 
 	#defines variables
-	global ic9100ops
-	global flex6500ops
-	global ic7610ops
-	global ic756ops
-#	global ts2000ops
+	global shack00ops
+	global shack01ops
+	global shack02ops
+	global shack03ops
+	global shack04ops
+	global shack05ops
+	global shackSATops
 
 	#reads predefined rows and columns for current time-slot, converts to html-data
-	ic9100ops = (curOps.iloc[[row, (row+1), (row+2)], [0,1,2]]).to_html(classes='data', index=False, header=False)
-	flex6500ops = (curOps.iloc[[row, (row+1), (row+2)], [0,3,4]]).to_html(classes='data', index=False, header=False)
-	ic7610ops = (curOps.iloc[[row, (row+1), (row+2)], [0,5,6]]).to_html(classes='data', index=False, header=False)
-	ic756ops = (curOps.iloc[[row, (row+1), (row+2)], [0,7,8]]).to_html(classes='data', index=False, header=False)
-#	ts2000ops = (curOps.iloc[[timeRow, (timeRow+1), (timeRow+2)], [0,9,10]]).to_html(classes='data', index=False, header=False)
+	shack00ops = (curOps.iloc[[row, (row+1), (row+2)], [0,1,2]]).to_html(classes='data', index=False, header=False)
+	shack01ops = (curOps.iloc[[row, (row+1), (row+2)], [0,3,4]]).to_html(classes='data', index=False, header=False)
+	shack02ops = (curOps.iloc[[row, (row+1), (row+2)], [0,5,6]]).to_html(classes='data', index=False, header=False)
+	shack03ops = (curOps.iloc[[row, (row+1), (row+2)], [0,7,8]]).to_html(classes='data', index=False, header=False)
+	shack04ops = (curOps.iloc[[row, (row+1), (row+2)], [0,9,10]]).to_html(classes='data', index=False, header=False)
+	shack05ops = (curOps.iloc[[row, (row+1), (row+2)], [0,11,12]]).to_html(classes='data', index=False, header=False)
+	shackSATops = (curOps.iloc[[row, (row+1), (row+2)], [0,13,14]]).to_html(classes='data', index=False, header=False)
 
 	#test for skipping rows when time 13-14
 #	ic9100ops = (curOps.iloc[[rtr, [0,1,2]]).to_html(classes='data', index=False, header=False)
@@ -140,7 +144,7 @@ print('Starting from ')
 print(sheet_url)
 
 #used to pause the script until next full minute for ease of mind
-#sleepUntil()
+sleepUntil()
 
 #run first time for populating tables
 fetch_sheets_data()
@@ -153,22 +157,23 @@ sched.start()
 @app.route('/', methods=("POST", "GET"))
 def ops():
     return render_template('ops.html',
-	shacks=['Shack-00', 'Shack-01', 'Shack-02', 'Shack-03'],
-       	curops=[ic9100ops, flex6500ops, ic7610ops, ic756ops],
-       	radios=['IC-9100 | 40m', 'Flex-6500 | 160 / 20m', 'IC-7610 | 80m / 15m', 'IC756 Pro III |  60m / 10m'],
-       	colors=['#add19e', '#f8c491', '#c8dcf1', '#fff0c5'],
-	links=['/shack00', '/shack01', '/shack02', '/shack03'],
+	shacks=['Shack-00', 'Shack-01', 'Shack-02', 'Shack-03', 'Shack-04', 'Shack-05', 'Shack-SAT'],
+       	curops=[shack00ops, shack01ops, shack02ops, shack03ops, shack04ops, shack05ops, shackSATops],
+       	radios=['Flex-6500 | 20m / 160m', 'IC-7610 | 40m', 'IC756 Pro III |  80m / 15m', 'IC9100 | 10m', 'FT-891 | 60m', 'FT-450D | 80m/div', 'TS-2000 | VHF/UHF'],
+       	colors=['#add19e', '#f8c491', '#c8dcf1', '#fff0c5', '#efbbbf', '#ee2288', '#e633ff'],
+	links=['/shack00', '/shack01', '/shack02', '/shack03', '/shack04', '/shack05', '/shackSAT'],
 	last_refresh=last_run, next_refresh=next_run,
        	hourOfDay=currentHour, nexthourOfDay=nextHour,
        	refresh=refreshCycle)
 
 #generating single-shack timeslots
+
 @app.route('/shack00', methods=("POST", "GET"))
 def shack00_table():
-    	return render_template('shack00.html',
-	shack='Shack-00',
-        curops=[ic9100ops],
-        radios=['IC-9100 | 40m'],
+        return render_template('shack00.html',
+        shack='Shack-00',
+        curops=[shack00ops],
+        radios=['Flex-6500 | 20m / 160m'],
         colors=['#add19e'],
         last_refresh=last_run, next_refresh=next_run,
         hourOfDay=currentHour, nexthourOfDay=nextHour,
@@ -178,8 +183,8 @@ def shack00_table():
 def shack01_table():
         return render_template('shack01.html',
         shack='Shack-01',
-        curops=[flex6500ops],
-        radios=['Flex-6500 | 160 / 20m'],
+        curops=[shack01ops],
+        radios=['IC-7610 | 40m'],
         colors=['#f8c491'],
         last_refresh=last_run, next_refresh=next_run,
         hourOfDay=currentHour, nexthourOfDay=nextHour,
@@ -189,8 +194,8 @@ def shack01_table():
 def shack02_table():
         return render_template('shack02.html',
         shack='Shack-02',
-        curops=[ic7610ops],
-        radios=['IC-7610 | 80m / 15m'],
+        curops=[shack02ops],
+        radios=['IC756 Pro III | 80m / 15m'],
         colors=['#c8dcf1'],
         last_refresh=last_run, next_refresh=next_run,
         hourOfDay=currentHour, nexthourOfDay=nextHour,
@@ -200,23 +205,45 @@ def shack02_table():
 def shack03_table():
         return render_template('shack03.html',
         shack='Shack-03',
-        curops=[ic756ops],
-        radios=['IC756 Pro III | 60m / 10m'],
+        curops=[shack03ops],
+        radios=['IC-9100 | 10m'],
         colors=['#fff0c5'],
         last_refresh=last_run, next_refresh=next_run,
         hourOfDay=currentHour, nexthourOfDay=nextHour,
         refresh=refreshCycle)
 
-#@app.route('/shack04', methods=("POST", "GET"))
-#def shack04_table():
-#        return render_template('shack04.html',
-#        shack='Shack-04',
-#        curops=[ts2000ops],
-#        radios=['TS-2000 | 60m / 10m'],
-#        colors=[''],
-#        last_refresh=last_run, next_refresh=next_run,
-#        hourOfDay=currentHour, nexthourOfDay=nextHour,
-#        refresh=refreshCycle)
+@app.route('/shack04', methods=("POST", "GET"))
+def shack04_table():
+        return render_template('shack04.html',
+        shack='Shack-04',
+        curops=[shack04ops],
+        radios=['FT-891 | 60m'],
+        colors=['#efbbbf'],
+        last_refresh=last_run, next_refresh=next_run,
+        hourOfDay=currentHour, nexthourOfDay=nextHour,
+        refresh=refreshCycle)
+
+@app.route('/shack05', methods=("POST", "GET"))
+def shack05_table():
+        return render_template('shack05.html',
+        shack='Shack-05',
+        curops=[shack05ops],
+        radios=['FT-450D | 80m / ymse'],
+        colors=['#ee2288'],
+        last_refresh=last_run, next_refresh=next_run,
+        hourOfDay=currentHour, nexthourOfDay=nextHour,
+        refresh=refreshCycle)
+
+@app.route('/shackSAT', methods=("POST", "GET"))
+def shackSAT_table():
+        return render_template('shackSAT.html',
+        shack='Shack-SAT',
+        curops=[shackSATops],
+        radios=['TS-2000 | VHF/UHF'],
+        colors=['#e633ff'],
+        last_refresh=last_run, next_refresh=next_run,
+        hourOfDay=currentHour, nexthourOfDay=nextHour,
+        refresh=refreshCycle)
 
 #run the Flask-app
 if __name__ == '__main__':
